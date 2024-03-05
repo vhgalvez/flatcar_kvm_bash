@@ -4,15 +4,15 @@
 VM_NAME=mv_instancia_flatcar
 USER_NAME=core
 SSH_DIR=/root/.ssh
-KEY_NAME="id_rsa_${VM_NAME}"  # Cambio realizado para usar el nombre personalizado
-SSH_PRIVATE_KEY="${SSH_DIR}/${KEY_NAME}"  # Ruta de la clave privada actualizada
+# Aquí utilizamos la variable VM_NAME para personalizar el nombre de las claves
+KEY_NAME="id_rsa_${VM_NAME}"
+SSH_PRIVATE_KEY="${SSH_DIR}/${KEY_NAME}"  # Ruta de la clave privada actualizada correctamente
 YAML_PATH="/root/ign/${VM_NAME}-config.yaml"
 IGN_PATH="/root/ign/${VM_NAME}-config.ign"
 SSH_EMAIL="vhgalvez@gmail.com"
 
 # Crea el directorio SSH si no existe
 mkdir -p "$SSH_DIR"
-
 # Ajusta los permisos del directorio
 chmod 700 "$SSH_DIR"
 
@@ -33,10 +33,10 @@ chmod 644 "${SSH_PRIVATE_KEY}.pub"
 echo "Generando el archivo YAML..."
 cat > "$YAML_PATH" <<EOF
 variant: flatcar
-version: 1.0.0  # Versión ajustada para compatibilidad
+version: 1.0.0  # Ajusta la versión si es necesario para tu entorno específico
 passwd:
   users:
-    - name: $USER_NAM
+    - name: $USER_NAME
       ssh_authorized_keys:
         - $(cat "${SSH_PRIVATE_KEY}.pub")
 EOF
