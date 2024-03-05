@@ -1,34 +1,33 @@
 #!/bin/bash
-# Uso: ./file_generation.sh <nombre_de_la_instancia>
 
+# Habilita la impresión de comandos antes de ejecutarlos
 set -x
 
-if [ "$#" -ne 1 ]; then
-    echo "Uso: $0 <nombre_de_la_instancia>"
-    exit 1
-fi
-
-VM_NAME="$1"
+# Define las variables utilizadas en el script
 USER_NAME="core"
-SSH_DIR="$HOME/.ssh"
-SSH_KEY="$SSH_DIR/id_rsa.pub"  # Corregido para apuntar al archivo de clave pública
+SSH_DIR="/root/.ssh"
+SSH_KEY="$SSH_DIR/id_rsa"
 
-YAML_PATH="$HOME/ign/$VM_NAME-config.yaml"
-IGN_PATH="$HOME/ign/$VM_NAME-config.ign"
+# Rutas para los archivos YAML y IGN
+YAML_PATH="/root/ign/mv_instancia_flatcar-config.yaml"
+IGN_PATH="/root/ign/mv_instancia_flatcar-config.ign"
 
+# Crea el directorio .ssh si no existe
 mkdir -p "$SSH_DIR"
-mkdir -p "$(dirname "$YAML_PATH")"
 
-if [ ! -f "$SSH_KEY" ]; then
-    echo "El archivo $SSH_KEY no existe. Generando una nueva clave SSH..."
-    ssh-keygen -t rsa -b 2048 -N "" -f "${SSH_KEY%.*}"  # Corregido para generar la clave privada y su correspondiente archivo .pub
+# Verifica que el archivo de la clave pública SSH exista
+if [ ! -f "$SSH_KEY.pub" ]; then
+    echo "El archivo de clave pública $SSH_KEY.pub no existe. Generando nuevas claves SSH..."
+    ssh-keygen -t rsa -b 2048 -N "" -f "$SSH_KEY"
 fi
 
-SSH_PUB_KEY=$(cat "$SSH_KEY")  # Asegurando que esta línea lea correctamente la clave pública
+# Captura la clave pública SSH
+SSH_PUB_KEY=$(cat "$SSH_KEY.pub")
 
+# Crea el archivo de configuración YAML
 cat > "$YAML_PATH" << EOF
 variant: flatcar
-version: 1.3.0  # Asegúrate de usar la versión correcta de Butane aquí
+version: 1.3.0
 passwd:
   users:
     - name: $USER_NAME
@@ -36,18 +35,11 @@ passwd:
         - $SSH_PUB_KEY
 EOF
 
-if [ ! -f "$YAML_PATH" ]; then
-    echo "Error, el archivo YAML no se generó."
-    exit 1
-else
-    echo "El archivo YAML se generó correctamente en $YAML_PATH"
-fi
-
+# Utiliza Butane para convertir el YAML a IGN
 butane --pretty --strict "$YAML_PATH" -o "$IGN_PATH"
 
-if [ ! -f "$IGN_PATH" ]; then
-    echo "Error, el archivo IGN no se generó."
-    exit 1
+if [ -f "$IGN_PATH" ]; then
+    echo "El archivo IGN se ha generado correctamente en $IGN_PATH."
 else
-    echo "El archivo IGN se generó correctamente en $IGN_PATH"
+    echo "Error, el archivo IGN no se ha generado."
 fi
