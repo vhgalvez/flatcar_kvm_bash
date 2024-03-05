@@ -3,23 +3,23 @@
 set -x
 
 USER_NAME="core"
-SSH_DIR="/home/victory/ssh_dir"  # Directorio específico para las claves SSH
-SSH_KEY="$SSH_DIR/id_rsa.pub"
+SSH_DIR="/home/victory/ssh_dir" # Cambia el directorio de las claves SSH al deseado
+SSH_KEY="$SSH_DIR/id_rsa" # Usa el archivo de clave privada para la generación
+SSH_PUB_KEY="$SSH_KEY.pub" # Define el archivo de clave pública
 
-IGN_DIR="$SSH_DIR/ign"
-IGN_PATH="$IGN_DIR/config.ign"  # Ubicación del archivo IGN
-YAML_PATH="$IGN_DIR/config.yaml"  # Ubicación del archivo YAML
+IGN_PATH="$SSH_DIR/config.ign"
+YAML_PATH="$SSH_DIR/config.yaml"
 
-# Crea el directorio SSH y IGN si no existen
-mkdir -p "$SSH_DIR" "$IGN_DIR"
+# Crea el directorio si no existe
+mkdir -p "$SSH_DIR"
 
-# Genera una nueva clave SSH si no existe
-if [ ! -f "$SSH_KEY" ]; then
-    echo "El archivo $SSH_KEY no existe. Generando una nueva clave SSH..."
-    ssh-keygen -t rsa -b 2048 -N "" -f "$SSH_DIR/id_rsa"
+# Comprueba si la clave SSH existe, si no, la genera
+if [ ! -f "$SSH_PUB_KEY" ]; then
+    echo "La clave SSH no existe. Generando una nueva clave SSH..."
+    ssh-keygen -t rsa -b 2048 -N "" -f "$SSH_KEY"
 fi
 
-# Crea el archivo de configuración YAML
+# Usa correctamente la clave pública en el archivo YAML
 cat > "$YAML_PATH" << EOF
 variant: flatcar
 version: 1.4.0
@@ -27,15 +27,15 @@ passwd:
   users:
     - name: $USER_NAME
       ssh_authorized_keys:
-        - $(cat "$SSH_KEY")
+        - $(cat "$SSH_PUB_KEY")
 EOF
 
-# Convierte YAML a IGN con Butane
-butane --pretty --strict "$YAML_PATH" -o "$IGN_PATH"
+# Convierte YAML a formato IGN con Butane
+butane "$YAML_PATH" -o "$IGN_PATH"
 
-# Verifica si el archivo IGN se generó correctamente
+# Verificación final
 if [ -f "$IGN_PATH" ]; then
-    echo "El archivo IGN se ha generado correctamente en $IGN_PATH."
+    echo "El archivo IGN se ha generado correctamente."
 else
     echo "Error, el archivo IGN no se ha generado."
 fi
