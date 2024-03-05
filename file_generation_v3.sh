@@ -1,45 +1,35 @@
 #!/bin/bash
 
-# Habilita la impresión de comandos antes de ejecutarlos
 set -x
 
-# Define las variables utilizadas en el script
 USER_NAME="core"
-SSH_DIR="/root/.ssh"
-SSH_KEY="$SSH_DIR/id_rsa"
+SSH_DIR="/home/victory/ssh_dir" # Directorio personalizado para las claves SSH
+SSH_KEY="$SSH_DIR/id_rsa.pub"
 
-# Rutas para los archivos YAML y IGN
-YAML_PATH="/root/ign/mv_instancia_flatcar-config.yaml"
-IGN_PATH="/root/ign/mv_instancia_flatcar-config.ign"
+IGN_PATH="/home/victory/ssh_dir/config.ign" # Actualiza con la ruta deseada
+YAML_PATH="/home/victory/ssh_dir/config.yaml" # Actualiza con la ruta deseada
 
-# Crea el directorio .ssh si no existe
 mkdir -p "$SSH_DIR"
 
-# Verifica que el archivo de la clave pública SSH exista
-if [ ! -f "$SSH_KEY.pub" ]; then
-    echo "El archivo de clave pública $SSH_KEY.pub no existe. Generando nuevas claves SSH..."
-    ssh-keygen -t rsa -b 2048 -N "" -f "$SSH_KEY"
+if [ ! -f "$SSH_KEY" ]; then
+    echo "El archivo $SSH_KEY no existe. Generando una nueva clave SSH..."
+    ssh-keygen -t rsa -b 2048 -N "" -f "$SSH_DIR/id_rsa"
 fi
 
-# Captura la clave pública SSH
-SSH_PUB_KEY=$(cat "$SSH_KEY.pub")
-
-# Crea el archivo de configuración YAML
 cat > "$YAML_PATH" << EOF
 variant: flatcar
-version: 1.3.0
+version: 1.4.0
 passwd:
   users:
     - name: $USER_NAME
       ssh_authorized_keys:
-        - $SSH_PUB_KEY
+        - $(cat "$SSH_KEY")
 EOF
 
-# Utiliza Butane para convertir el YAML a IGN
-butane --pretty --strict "$YAML_PATH" -o "$IGN_PATH"
+butane "$YAML_PATH" > "$IGN_PATH"
 
 if [ -f "$IGN_PATH" ]; then
-    echo "El archivo IGN se ha generado correctamente en $IGN_PATH."
+    echo "El archivo IGN se ha generado correctamente."
 else
     echo "Error, el archivo IGN no se ha generado."
 fi
