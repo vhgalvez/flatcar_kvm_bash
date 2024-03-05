@@ -11,7 +11,7 @@ fi
 VM_NAME="$1"
 USER_NAME="core"
 SSH_DIR="$HOME/.ssh"
-SSH_KEY="$SSH_DIR/id_rsa"
+SSH_KEY="$SSH_DIR/id_rsa.pub"  # Corregido para apuntar al archivo de clave pública
 
 YAML_PATH="$HOME/ign/$VM_NAME-config.yaml"
 IGN_PATH="$HOME/ign/$VM_NAME-config.ign"
@@ -19,12 +19,12 @@ IGN_PATH="$HOME/ign/$VM_NAME-config.ign"
 mkdir -p "$SSH_DIR"
 mkdir -p "$(dirname "$YAML_PATH")"
 
-if [ ! -f "$SSH_KEY.pub" ]; then
-    echo "El archivo $SSH_KEY.pub no existe. Generando una nueva clave SSH..."
-    ssh-keygen -t rsa -b 2048 -N "" -f "$SSH_KEY"
+if [ ! -f "$SSH_KEY" ]; then
+    echo "El archivo $SSH_KEY no existe. Generando una nueva clave SSH..."
+    ssh-keygen -t rsa -b 2048 -N "" -f "${SSH_KEY%.*}"  # Corregido para generar la clave privada y su correspondiente archivo .pub
 fi
 
-SSH_PUB_KEY=$(cat "$SSH_KEY.pub")
+SSH_PUB_KEY=$(cat "$SSH_KEY")  # Asegurando que esta línea lea correctamente la clave pública
 
 cat > "$YAML_PATH" << EOF
 variant: flatcar
