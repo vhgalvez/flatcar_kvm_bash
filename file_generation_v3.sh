@@ -6,11 +6,12 @@ USER_NAME="core"
 SSH_DIR="/home/victory/ssh_dir"  # Directorio específico para las claves SSH
 SSH_KEY="$SSH_DIR/id_rsa.pub"
 
-IGN_PATH="$SSH_DIR/config.ign"  # Ubicación del archivo IGN
-YAML_PATH="$SSH_DIR/config.yaml"  # Ubicación del archivo YAML
+IGN_DIR="$SSH_DIR/ign"
+IGN_PATH="$IGN_DIR/config.ign"  # Ubicación del archivo IGN
+YAML_PATH="$IGN_DIR/config.yaml"  # Ubicación del archivo YAML
 
-# Crea el directorio SSH si no existe
-mkdir -p "$SSH_DIR"
+# Crea el directorio SSH y IGN si no existen
+mkdir -p "$SSH_DIR" "$IGN_DIR"
 
 # Genera una nueva clave SSH si no existe
 if [ ! -f "$SSH_KEY" ]; then
@@ -34,7 +35,7 @@ butane "$YAML_PATH" > "$IGN_PATH"
 
 # Verifica si el archivo IGN se generó correctamente
 if [ -f "$IGN_PATH" ]; then
-    echo "El archivo IGN se ha generado correctamente."
+    echo "El archivo IGN se ha generado correctamente en $IGN_PATH."
 else
     echo "Error, el archivo IGN no se ha generado."
 fi
