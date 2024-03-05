@@ -31,7 +31,7 @@ passwd:
 EOF
 
 # Convierte YAML a IGN con Butane
-butane "$YAML_PATH" > "$IGN_PATH"
+butane --pretty --strict "$YAML_PATH" -o "$IGN_PATH"
 
 # Verifica si el archivo IGN se generó correctamente
 if [ -f "$IGN_PATH" ]; then
