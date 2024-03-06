@@ -55,7 +55,13 @@ Copy code
   <name>default</name>
   <forward mode="nat"/>
   <bridge name="virbr0" />
+  <ip address="192.168.122.1" netmask="255.255.255.0">
+    <dhcp>
+      <range start="192.168.122.2" end="192.168.122.254"/>
+    </dhcp>
+  </ip>
 </network>
+
 Guarda este contenido en un archivo, por ejemplo, default_network.xml.
 
 Crea la red utilizando el comando virsh net-define:
