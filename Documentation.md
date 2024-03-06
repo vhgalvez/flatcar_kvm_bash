@@ -33,3 +33,16 @@ Este comando debería imprimir la versión de ct que has descargado, confirmando
 Ahora que ct está instalado en tu sistema, puedes comenzar a convertir archivos de configuración de Container Linux (YAML) en archivos de configuración de Ignition (JSON) adecuados para CoreOS Container Linux y Flatcar Container Linux.
 
 Recuerda ajustar la ruta de descarga en el paso 1 si estás utilizando una arquitectura diferente o si necesitas una versión diferente de ct.
+
+./ct -in-file /ruta/a/tu/config.yaml -out-file /ruta/a/tu/config.ign
+
+
+
+/root/ign/mv_instancia_flatcar-config.ign
+
+./ct -in-file /ruta/a/tu/config.yaml -out-file /root/ign/mv_instancia_flatcar-config.ign
+
+mv_instancia_flatcar-config.yaml
+
+
+./ct -in-file /root/ign/mv_instancia_flatcar-config.yaml -out-file /root/ign/mv_instancia_flatcar-config.ign
