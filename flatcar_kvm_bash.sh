@@ -15,6 +15,16 @@ DISK_FORMAT="qcow2"
 DISK_BUS="virtio"
 CONFIG_FILE="/var/lib/libvirt/flatcar-linux/$VM_NAME/provision.ign"
 
+# Nombre del sistema operativo proporcionado como argumento
+OS_NAME=$1
+
+# Verifica si se proporcionó el nombre del sistema operativo
+if [ -z "$OS_NAME" ]; then
+    echo "ERROR: El nombre del sistema operativo no se ha especificado."
+    echo "Uso: sudo ./flatcar_kvm_bash.sh <nombre_del_sistema_operativo>"
+    exit 1
+fi
+
 # Crear la máquina virtual
 echo "Creando la máquina virtual $VM_NAME..."
 sudo mkdir -p /var/lib/libvirt/flatcar-linux/$VM_NAME/

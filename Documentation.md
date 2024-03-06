@@ -46,3 +46,25 @@ mv_instancia_flatcar-config.yaml
 
 
 ./ct -in-file /root/ign/mv_instancia_flatcar-config.yaml -out-file /root/ign/mv_instancia_flatcar-config.ign
+
+
+Crea un archivo XML para definir la red. Puedes usar el siguiente ejemplo como base:
+xml
+Copy code
+<network>
+  <name>default</name>
+  <forward mode="nat"/>
+  <bridge name="virbr0" />
+</network>
+Guarda este contenido en un archivo, por ejemplo, default_network.xml.
+
+Crea la red utilizando el comando virsh net-define:
+
+bash
+Copy code
+sudo virsh net-define default_network.xml
+Inicia la red recién definida:
+bash
+Copy code
+sudo virsh net-start default
+Una vez que hayas creado la red 'default', intenta ejecutar nuevamente el script para crear la máquina virtual.
