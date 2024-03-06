@@ -16,6 +16,9 @@ DISK_BUS="virtio"
 CONFIG_FILE="/var/lib/libvirt/flatcar-linux/$VM_NAME/provision.ign"
 
 # Crear la máquina virtual
+echo "Creando la máquina virtual $VM_NAME..."
+sudo mkdir -p /var/lib/libvirt/flatcar-linux/$VM_NAME/
+sudo cp -R  /root/ign/mv_instancia_flatcar-config.ign /var/lib/libvirt/flatcar-linux/$VM_NAME/provision.ign
 virt-install --connect qemu:///system \
              --import \
              --name "$VM_NAME" \
