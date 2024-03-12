@@ -4,7 +4,7 @@
 
 # Argumentos y variables
 VM_NAME=$1
-BASE_IMAGE="/var/lib/libvirt/images/flatcar_image/flatcar_production_qemu_image.img"
+BASE_IMAGE="/var/lib/libvirt/images/flatcar_image/flatcar_image/flatcar_production_qemu_image.img"
 VM_DISK_PATH="/var/lib/libvirt/images/${VM_NAME}.qcow2"
 DISK_SIZE="20G"
 IGN_DIR="/root/ign"
