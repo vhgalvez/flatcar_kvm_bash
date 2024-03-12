@@ -1,13 +1,21 @@
 #!/bin/bash
 
-# Argumentos y variables
-VM_NAME=$1
-USER_NAME=${2:-core}
-SSH_DIR=${3:-/root/.ssh}
-SSH_EMAIL=${4:-"example@example.com"}
-IGN_DIR=${5:-"/root/ign"}
+# Configuraciones para generar archivos IGN a partir de claves SSH para VMs
 
-# Variables internas
+# Configuramos opciones de salida seguras para el script
+set -e
+set -o errexit
+set -o nounset
+set -o pipefail
+
+# Personalización - EDITAR ESTOS VALORES
+VM_NAME="nombre_vm"
+USER_NAME="core"
+SSH_DIR="/root/.ssh"
+SSH_EMAIL="example@example.com"
+IGN_DIR="/root/ign"
+
+# Variables internas (no es necesario editarlas)
 KEY_NAME="id_rsa_${VM_NAME}"
 SSH_PRIVATE_KEY="${SSH_DIR}/${KEY_NAME}" 
 SSH_PUBLIC_KEY="${SSH_DIR}/${KEY_NAME}.pub"
@@ -22,11 +30,13 @@ mkdir -p "$IGN_DIR"
 if [ ! -f "$SSH_PRIVATE_KEY" ]; then
     echo "Generando clave SSH para $VM_NAME..."
     ssh-keygen -t rsa -b 2048 -N '' -f "$SSH_PRIVATE_KEY" -C "$SSH_EMAIL"
+    echo "Clave SSH generada: $SSH_PRIVATE_KEY"
 else
-    echo "Clave SSH ya existe para $VM_NAME."
+    echo "La clave SSH ya existe para $VM_NAME: $SSH_PRIVATE_KEY"
 fi
 
 # Prepara archivo YAML con clave pública
+echo "Preparando archivo YAML: $YAML_PATH"
 cat > "$YAML_PATH" <<EOF
 variant: flatcar
 version: 1.1.0
@@ -40,6 +50,7 @@ EOF
 echo "Archivo YAML generado: $YAML_PATH"
 
 # Convierte YAML a IGN con Butane (o ct, dependiendo de tu entorno)
+echo "Convirtiendo YAML a IGN..."
 butane --pretty --strict "$YAML_PATH" -o "$IGN_PATH" || { echo "Error convirtiendo a IGN"; exit 1; }
 
 echo "Archivo IGN generado: $IGN_PATH"
