@@ -8,9 +8,9 @@ set -o pipefail
 
 # Determinar el directorio home del usuario real, incluso cuando se ejecuta con sudo
 if [[ ! -z "${SUDO_USER}" ]]; then
-  USER_HOME=$(getent passwd "${SUDO_USER}" | cut -d: -f6)
+    USER_HOME=$(getent passwd "${SUDO_USER}" | cut -d: -f6)
 else
-  USER_HOME=$HOME
+    USER_HOME=$HOME
 fi
 
 # Definición de variables para personalización - EDITAR ESTOS VALORES
@@ -24,8 +24,8 @@ LOG_FILE="${USER_HOME}/vm_creation.log"  # Archivo de log
 
 # Crear directorio para logs si no existe
 if [ ! -d "$(dirname "$LOG_FILE")" ]; then
-  mkdir -p "$(dirname "$LOG_FILE")"
-  chmod 755 "$(dirname "$LOG_FILE")"
+    mkdir -p "$(dirname "$LOG_FILE")"
+    chmod 755 "$(dirname "$LOG_FILE")"
 fi
 
 # Función para verificar existencia del archivo IGN
@@ -45,10 +45,10 @@ create_vm_disk() {
 create_vm() {
     echo "Creando máquina virtual: $VM_NAME" >> "$LOG_FILE"
     virt-install --name "${VM_NAME}" --vcpus 2 --memory 2048 \
-        --disk path="${VM_DISK_PATH}",format=qcow2 \
-        --os-variant generic --import --network network=default \
-        --graphics none --noautoconsole \
-        --qemu-commandline="-fw_cfg name=opt/com.coreos/config,file=${CONFIG_IGN_PATH}" || handle_error "Creación de la VM"
+    --disk path="${VM_DISK_PATH}",format=qcow2 \
+    --os-variant generic --import --network network=default \
+    --graphics none --noautoconsole \
+    --qemu-commandline="-fw_cfg name=opt/com.coreos/config,file=${CONFIG_IGN_PATH}" || handle_error "Creación de la VM"
 }
 
 # Función para manejar errores
