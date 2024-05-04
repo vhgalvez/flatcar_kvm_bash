@@ -5,7 +5,7 @@ PROJECT_NAME="cluster_openshift"
 VM_NAME="key_cluster_openshift"
 USER_NAME="core"
 SSH_DIR="/root/.ssh/${PROJECT_NAME}/${VM_NAME}"
-CONFIG_DIR="/root/.ssh/${PROJECT_NAME}/Ignition"  # Ruta personalizada para configuración
+CONFIG_DIR="/root/.ssh/${PROJECT_NAME}/ignition"  # Ruta personalizada para configuración
 
 # Nombres de archivo personalizados
 YAML_FILE_NAME="${VM_NAME}-config.yaml"
