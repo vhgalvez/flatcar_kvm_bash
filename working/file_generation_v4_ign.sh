@@ -1,24 +1,31 @@
 #!/bin/bash
 
 # Variables generales
-VM_NAME=mv_instancia_flatcar
-USER_NAME=core
-SSH_DIR=/root/.ssh
-YAML_CONFIG_PATH="/custom/path/to/config.yaml"  # Customize your YAML config path here
-IGN_CONFIG_PATH="/custom/path/to/config.ign"  # Customize your IGN config path here
+PROJECT_NAME="cluster_openshift"
+VM_NAME="key_cluster_openshift"
+USER_NAME="core"
+SSH_DIR="/root/.ssh"
+CONFIG_DIR="/home/${USER}/${PROJECT_NAME}"  # Ruta personalizada para configuración
+
+# Nombres de archivo personalizados
+YAML_FILE_NAME="${VM_NAME}-config.yaml"
+IGN_FILE_NAME="${VM_NAME}-config.ign"
+YAML_PATH="${CONFIG_DIR}/${YAML_FILE_NAME}"
+IGN_PATH="${CONFIG_DIR}/${IGN_FILE_NAME}"
+
+# Claves SSH
+KEY_NAME="id_rsa_${VM_NAME}"
+SSH_PRIVATE_KEY="${SSH_DIR}/${KEY_NAME}"
+SSH_PUBLIC_KEY="${SSH_DIR}/${KEY_NAME}.pub"
 SSH_EMAIL="vhgalvez@gmail.com"
 
-# Crea el directorio SSH si no existe
+# Crear directorios necesarios
 mkdir -p "$SSH_DIR"
-# Ajusta los permisos del directorio
+mkdir -p "$CONFIG_DIR"
 chmod 700 "$SSH_DIR"
+chmod 700 "$CONFIG_DIR"
 
-# Variables for SSH key paths
-KEY_NAME="id_rsa_${VM_NAME}"
-SSH_PRIVATE_KEY="${SSH_DIR}/${KEY_NAME}"  # Ruta de la clave privada actualizada correctamente
-SSH_PUBLIC_KEY="${SSH_DIR}/${KEY_NAME}.pub"  # Definición explícita de la ruta de la clave pública
-
-# Genera un nuevo par de claves SSH si no existe
+# Generación de claves SSH
 if [ ! -f "$SSH_PRIVATE_KEY" ]; then
     echo "Generando una nueva clave SSH para $VM_NAME..."
     ssh-keygen -t rsa -b 2048 -N '' -f "$SSH_PRIVATE_KEY" -C "$SSH_EMAIL"
@@ -27,15 +34,14 @@ else
     echo "La clave SSH ya existe para $VM_NAME en $SSH_DIR."
 fi
 
-# Ajusta los permisos de las claves
 chmod 600 "$SSH_PRIVATE_KEY"
 chmod 644 "$SSH_PUBLIC_KEY"
 
-# Prepara el archivo YAML con la clave pública
-echo "Generando el archivo YAML para $VM_NAME..."
-cat > "$YAML_CONFIG_PATH" <<EOF
+# Preparación del archivo YAML con la clave pública
+echo "Generando el archivo YAML para $VM_NAME en $YAML_PATH..."
+cat > "$YAML_PATH" <<EOF
 variant: flatcar
-version: 1.1.0  # Ajusta la versión si es necesario para tu entorno específico
+version: 1.1.0
 passwd:
   users:
     - name: $USER_NAME
@@ -43,18 +49,18 @@ passwd:
         - $(cat "$SSH_PUBLIC_KEY")
 EOF
 
-# Convierte el archivo YAML a formato IGN con Butane
+# Conversión de YAML a formato IGN con Butane
 echo "Convirtiendo YAML a formato IGN para $VM_NAME..."
-butane --pretty --strict "$YAML_CONFIG_PATH" -o "$IGN_CONFIG_PATH"
+butane --pretty --strict "$YAML_PATH" -o "$IGN_PATH"
 
-# Verifica si el archivo IGN se ha generado correctamente
-if [ -f "$IGN_CONFIG_PATH" ]; then
-    echo "El archivo IGN se ha generado correctamente en $IGN_CONFIG_PATH para $VM_NAME."
+# Verificación de la generación del archivo IGN
+if [ -f "$IGN_PATH" ]; then
+    echo "El archivo IGN se ha generado correctamente en $IGN_PATH para $VM_NAME."
 else
     echo "Error, el archivo IGN no se ha generado para $VM_NAME."
     exit 1
 fi
 
-# Muestra el contenido del directorio de las claves SSH
+# Verificación de las claves SSH
 echo "Verificando la generación de las claves SSH para $VM_NAME..."
 ls -lha "$SSH_DIR"
