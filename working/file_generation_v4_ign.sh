@@ -4,7 +4,7 @@
 PROJECT_NAME="cluster_openshift"
 VM_NAME="key_cluster_openshift"
 USER_NAME="core"
-SSH_DIR="/root/.ssh"
+SSH_DIR="/root/.ssh/cluster_openshift"
 CONFIG_DIR="/home/${USER}/${PROJECT_NAME}"  # Ruta personalizada para configuración
 
 # Nombres de archivo personalizados
